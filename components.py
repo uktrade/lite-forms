@@ -609,8 +609,9 @@ class Link:
 
 
 class FiltersBar:
-    def __init__(self, filters: list):
+    def __init__(self, filters: List, advanced_filters: Optional[List] = None):
         self.filters = filters
+        self.advanced_filters = advanced_filters
 
 
 class Custom:
