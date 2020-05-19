@@ -564,6 +564,7 @@ class TokenBar:
         description: str = "",
         optional: bool = False,
         classes: [] = None,
+        input_type: str = "token_bar"
     ):
         """
         TokenBar allows for input of complex pieces of information in compact form,
@@ -578,7 +579,7 @@ class TokenBar:
         self.options = options
         self.optional = optional
         self.classes = classes if classes else ["tokenfield-container"]
-        self.input_type = "token_bar"
+        self.input_type = input_type
 
 
 class AutocompleteInput:
