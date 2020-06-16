@@ -25,6 +25,7 @@ from lite_forms.helpers import (
     convert_form_to_summary_list_instance,
     get_all_form_components,
     insert_hidden_fields,
+    normalise_errors,
 )
 from lite_forms.templatetags import custom_tags
 from lite_forms.templatetags.custom_tags import prefix_dots
@@ -115,6 +116,39 @@ class FormTests(TestCase):
                 "user.first_name": "Matthew",
             },
         )
+
+    def test_normalise_errors_single_question(self):
+        # single question form
+        form = Form(questions=[TextInput("name"),])
+
+        errors = ["An error"]
+
+        cleaned_errors = {"name": ["An error"]}
+        self.assertEqual(normalise_errors(errors, questions=form.questions), cleaned_errors)
+
+    def test_normalise_errors_multi_question(self):
+        form = Form(questions=[TextInput("name"), TextInput("age")])
+
+        errors = ["An error"]
+
+        cleaned_errors = {"non_field_errors": ["An error"]}
+        self.assertEqual(normalise_errors(errors, questions=form.questions), cleaned_errors)
+
+    def test_normalise_errors_noop(self):
+        form = Form(questions=[TextInput("name"), TextInput("age"), TextInput("password"), DetailComponent("", ""),])
+
+        errors = {
+            "name": "This field must not be empty",
+            "age": "This field must not be empty",
+            "password": "This field must not be empty",
+        }
+
+        cleaned_errors = {
+            "name": "This field must not be empty",
+            "age": "This field must not be empty",
+            "password": "This field must not be empty",
+        }
+        self.assertEqual(normalise_errors(errors, form.questions), cleaned_errors)
 
     def test_convert_form_to_summary_list_instance(self):
         form = Form(title="I Am Easy to Find", caption="The National", default_button_name="Rylan")

@@ -149,6 +149,25 @@ def convert_to_markdown(text):
         return None
 
 
+def normalise_errors(errors, questions=None):
+    """
+    Errors can be returned by the API as a dict containing a mapping from each
+    form field to to an error or it may be a flat list of errors.
+    This function normalises that to reduce branching logic in templates.
+    """
+    cleaned_errors = errors
+    if isinstance(errors, list):
+        if len(questions) == 1:
+            # if there is only one question in the form,
+            # the error can be associated with that single question
+            cleaned_errors = {questions[0].name: errors}
+        else:
+            # otherwise, put it in django's standard format
+            # for "non_field_errors"
+            cleaned_errors = {"non_field_errors": errors}
+    return cleaned_errors
+
+
 def handle_lists(data):
     """
     By default get() returns only one value, we use getlist() to return multiple values

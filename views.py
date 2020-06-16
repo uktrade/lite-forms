@@ -21,6 +21,7 @@ from lite_forms.helpers import (
     insert_hidden_fields,
     get_all_form_components,
     validate_data_unknown,
+    normalise_errors,
 )
 from lite_forms.submitters import submit_paged_form
 
@@ -132,10 +133,10 @@ class SingleFormView(FormView):
         else:
             validated_data, _ = self.get_action()(request, self.clean_data(data.copy()))  # noqa
 
+        form = self.get_form()
         if "errors" in validated_data:
-            return form_page(
-                request, self.get_form(), data=data, errors=validated_data.get("errors"), extra_data=self.context
-            )
+            cleaned_errors = normalise_errors(validated_data["errors"], form.questions)
+            return form_page(request, form, data=data, errors=cleaned_errors, extra_data=self.context)
 
         self._validated_data = validated_data
 
